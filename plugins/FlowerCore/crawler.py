@@ -15,9 +15,13 @@ def link(problem):
 def get_recent_submission(CF_id):
     try:
         json = requests.get('https://codeforces.com/api/user.status?handle={:s}&from=1&count=1'.format(CF_id)).json()
+        print(json)
         if json['status'] == 'FAILED':
             return None
-        return json['result'][0]
+        try:
+            return json['result'][0]
+        except IndexError:
+            return None
     except requests.exceptions.JSONDecodeError:
         return None
 

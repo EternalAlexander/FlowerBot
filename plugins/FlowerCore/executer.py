@@ -97,8 +97,9 @@ class Flower:
         if sender.bind is None:
             return '你好像没有在绑定账号啊'
         result = sender.bind.check()
-        cls.binding.remove(sender.bind)
         sender.bind = None
+        if sender.bind in cls.binding:
+            cls.binding.remove(sender.bind)
         if result != 1:
             return {-1: "未在规定时间内提交", -2: "没有发现符合要求的提交", -3: "网络错误，请稍后再试"}[result]
         cls.user_list[sender.qq] = sender
@@ -414,7 +415,7 @@ def execute_command(command, sender):
                 --------------------
                 {:s}
                 ---------------------
-                If you believe this is a glitch, please contact the developer.""".format(traceback.format_exc(limit=3))
+                If you believe this is a glitch, please contact the developer.""".format(traceback.format_exc())
 
 def exec_command(command, sender):
     res = interpret(command)

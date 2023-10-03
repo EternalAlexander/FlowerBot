@@ -19,6 +19,7 @@ github 地址：https://github.com/EternalAlexander/FlowerBot
 VersionMessage = """最近更新于 2023/10/3
 优化了指令解析功能
 新的 duel 将会记录通过时间和题目
+github 地址：https://github.com/EternalAlexander/FlowerBot
 """
 
 
