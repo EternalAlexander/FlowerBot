@@ -222,7 +222,7 @@ class Flower:
 
     @classmethod
     def ongoing(cls, sender, *args):
-        msg = ''
+        msg = '正在进行的决斗：\n'
         for d in cls.duels:
             assert (d.status != 'finished')
             if d.status == 'pending':
