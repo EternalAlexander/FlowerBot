@@ -1,0 +1,8 @@
+[bot]
+adapters = ["alicebot.adapter.mirai"]
+plugin_dirs = ["plugins"]
+
+[adapter.mirai]
+adapter_type = "ws"
+verify_key = "1234567890"
+qq = 3069244614
