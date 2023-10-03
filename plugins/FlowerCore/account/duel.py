@@ -11,7 +11,7 @@ def init():
 
 
 class Duel:
-    def __init__(self, user1, user2, tags, index = 0, not_seen = True):
+    def __init__(self, user1, user2, tags, index=0, not_seen=True):
         self.user1 = user1
         self.user2 = user2
         self.tags = tags
@@ -39,6 +39,9 @@ class Duel:
             t = threading.Thread(target=self.exclude)
             t.start()
 
+    def duration(self):
+        return self.finish_time - self.begin_time
+
     def rival(self, sender) -> user.User:
         if sender == self.user1:
             return self.user2
@@ -50,7 +53,7 @@ class Duel:
         if s1 is None or s2 is None:
             return
         self.excluded_problems = s1.union(s2)
-        print("exclude {:d}, {:d} => {:d} problems".format(len(s1),len(s2),len(self.excluded_problems)))
+        print("exclude {:d}, {:d} => {:d} problems".format(len(s1), len(s2), len(self.excluded_problems)))
 
     def begin(self) -> int:
         if self.status != 'pending':

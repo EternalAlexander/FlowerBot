@@ -182,9 +182,10 @@ class Flower:
         cls.duels.remove(duet)
         return """决斗结束，{:s} 取得了胜利。
         Rating 变化：{:s} {:d} + {:d} = {:d}
-         {:s} {:d} + {:d} = {:d}""".format(
+         {:s} {:d} + {:d} = {:d}
+         用时：{:s}""".format(
             winner.name(), winner.name(), old[0], new[0] - old[0], new[0],
-            loser.name(), old[1], new[1] - old[1], new[1])
+            loser.name(), old[1], new[1] - old[1], new[1], timestr(duet.duration()))
 
     @classmethod
     def change(cls, sender, *args):
@@ -257,42 +258,79 @@ class Flower:
     def history(cls, sender, *args):
         try:
             args = args[0]
-            target = target2 = cls.user_list[int(args[0])]
-            if len(args) > 1:
-                target2 = cls.user_list[int(args[1])]
+            try:
+                target = target2 = cls.user_list[int(args[0])]
+                if len(args) > 1:
+                    target2 = cls.user_list[int(args[1])]
+            except:
+                if args[0] == 'recent':
+                    target = 'recent'
+                else: return "参数非法。"
         except:
             target = target2 = sender
-        msg = '{:s} Rating = {:d}\n\n'.format(target.name(), target.display_rating())
-        c1 = 0
-        c2 = 0
-        for d in target.duel_history:
-            try:
-                begin = timestr(d.begin_time)
-                end = timestr(d.finish_time)
-                duration = timestr(d.finish_time - d.begin_time)
-                timestamp = 'From {:s} to {:s}, lasted for {:s}\n'.format(begin, end, duration)
-            except TypeError:
-                timestamp = ''
-            try:
-                problem = 'on {:s}\n'.format(crawler.problem_name(d.problem, rating=True))
-            except TypeError:
-                problem = ''
-            part = {d.user1, d.user2}
-            if not ((target in part) and (target2 in part)):
-                continue
-            if d.status == 'finished':
-                line = '{:s} 胜 {:s}\n'.format(target.name(), d.rival(target).name())
-                if target != d.result['winner']:
-                    c2 += 1
-                    line = '{:s} 负 {:s}\n'.format(target.name(), d.rival(target).name())
+        if target != 'recent':
+            msg = '用户 {:s} Rating = {:d}\n\n'.format(target.name(), target.display_rating())
+            c1 = 0
+            c2 = 0
+            for d in target.duel_history:
+
+                part = {d.user1, d.user2}
+                if not ((target in part) and (target2 in part)):
+                    continue
+                try:
+                    begin = timestr(d.begin_time)
+                    end = timestr(d.finish_time)
+                    duration = timestr(d.finish_time - d.begin_time)
+                    timestamp = 'From {:s} to {:s}, lasted for {:s}\n'.format(begin, end, duration)
+                except TypeError:
+                    timestamp = ''
+                try:
+                    problem = 'on {:s}\n'.format(crawler.problem_name(d.problem, rating=True))
+                except TypeError:
+                    problem = ''
+                if d.status == 'finished':
+                    line = '{:s} 胜 {:s}\n'.format(target.name(), d.rival(target).name())
+                    if target != d.result['winner']:
+                        c2 += 1
+                        line = '{:s} 负 {:s}\n'.format(target.name(), d.rival(target).name())
+                    else:
+                        c1 += 1
+                    line = "#{:d}: ".format(d.index) + line
                 else:
-                    c1 += 1
-                line = "#{:d}: ".format(d.index) + line
-            else:
-                line = '{:s} 投降了\n'.format(d.result['loser'].name())
-            msg += line + problem + timestamp + '\n'
-        msg += '\n比分为 {:d} : {:d}'.format(c1,c2)
-        return {'title': '决斗历史', 'brief': '用户 {:s} 的决斗历史：'.format(target.name()), 'text': msg}
+                    line = '{:s} 投降了\n'.format(d.result['loser'].name())
+                msg += line + problem + timestamp + '\n'
+            msg += '\n比分为 {:d} : {:d}'.format(c1,c2)
+            return {'title': '决斗历史', 'brief': '用户 {:s} 的决斗历史：'.format(target.name()), 'text': msg}
+
+        else:
+            msg = '最近的 {:d} 场单挑:\n\n'.format(DISPLAY_LIMIT)
+            lis = []
+            for u in cls.user_list:
+                for d in cls.user_list[u].duel_history:
+                    if d.index < cls.index - DISPLAY_LIMIT:
+                        continue
+                    try:
+                        begin = timestr(d.begin_time)
+                        end = timestr(d.finish_time)
+                        duration = timestr(d.finish_time - d.begin_time)
+                        timestamp = 'From {:s} to {:s}, lasted for {:s}\n'.format(begin, end, duration)
+                    except TypeError:
+                        timestamp = ''
+                    try:
+                        problem = 'on {:s}\n'.format(crawler.problem_name(d.problem, rating=True))
+                    except TypeError:
+                        problem = ''
+                    if d.status == 'finished':
+                        line = '{:s} 胜 {:s}\n'.format(d.result['winner'].name(), d.rival(d.result['winner']).name())
+                        line = "#{:d}: ".format(d.index) + line
+                    else:
+                        line = '{:s} 投降了\n'.format(d.result['loser'].name())
+                    lis.append(line + problem + timestamp)
+            lis = list(set(lis))
+            lis.sort()
+            for x in lis:
+                msg += x + '\n'
+            return {'title': '决斗历史', 'brief': '最近的的决斗历史：', 'text': msg}
 
     @classmethod
     def statics(cls, sender, *args):
