@@ -144,7 +144,7 @@ class Flower:
             return "抱歉，我没找到符合条件的题目。"
         rival = sender.duel.rival(sender)
         return """你接受了 {:s} 的挑战。题目链接：{:s}，
-        通过后输入 /duel judge 进行结算。""".format(rival.name(), crawler.link(sender.duel.problem))
+通过后输入 /duel judge 进行结算。""".format(rival.name(), crawler.link(sender.duel.problem))
 
     @classmethod
     def decline(cls, sender, *args):
@@ -181,7 +181,8 @@ class Flower:
         new = duet.result['new']
         cls.duels.remove(duet)
         return """决斗结束，{:s} 取得了胜利。
-        Rating 变化：{:s} {:d} + {:d} = {:d}, {:s} {:d} + {:d} = {:d}""".format(
+        Rating 变化：{:s} {:d} + {:d} = {:d}
+         {:s} {:d} + {:d} = {:d}""".format(
             winner.name(), winner.name(), old[0], new[0] - old[0], new[0],
             loser.name(), old[1], new[1] - old[1], new[1])
 
